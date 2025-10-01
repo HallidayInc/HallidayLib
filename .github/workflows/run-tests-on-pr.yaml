@@ -1,0 +1,34 @@
+name: Run Unit Tests on PR
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '**'
+
+jobs:
+  Unit-Tests:
+    environment: UNIT-TESTS
+    runs-on: ubuntu-latest
+    env:
+      DO_NOT_TRACK: 1
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+
+      - name: Run Tests
+        run: |
+          make test-with-docker-db ARGS="--junit-path=test-results.xml"
+
+      - name: Convert junit test results to json
+        if: always()
+        run: |
+          deno run -A npm:junit-to-ctrf test-results.xml -o test-results.json -t Deno
+
+      - name: Generate Test Summary
+        uses: ctrf-io/github-test-reporter@v1
+        with:
+            report-path: test-results.json
+        if: always()

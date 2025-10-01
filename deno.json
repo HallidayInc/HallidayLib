@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "zod": "jsr:@zod/zod",
+    "@asserts": "./src/asserts.ts",
+    "@halliday": "./src/mod.ts"
+  }
+}
